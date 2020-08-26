@@ -1,0 +1,81 @@
+﻿@model IndividualAttenVM
+
+@{ 
+    var name = Model.CurrentUser.FirstName + " " + Model.CurrentUser.MiddleName + " " + Model.CurrentUser.LastName;
+    var imagePath = "/images/" + (Model.CurrentUser.ImagePath ?? "placeholder.png");
+    string isAdmin = Model.CurrentUser.Role == true ? "Admin" : "Employee";
+    var isPunched = Model.IsPunchedIn == true ? 1 : 0;
+}
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <meta name="author" content="Yashas Gowda">
+    <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.css" />
+    <link rel="stylesheet" href="~/css/home_style.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <title>Attendance</title>
+</head>
+<body onload="startTime(); checkAttandance(@isPunched);">
+    <div class="container">
+        <div class="left">
+            <div class="icon_section">
+                <img src="~/assets/icon_white.png" alt="logo" />
+                <h3>HRM</h3>
+            </div>
+
+            <div class="nav_section">
+                <ul>
+                    <li><a asp-controller="admin" asp-action="dashboard">Dashboard</a></li>
+                    <li><a asp-controller="admin" asp-action="employeelist">Employees</a></li>
+                    <li class="current"><a asp-controller="admin" asp-action="attendance">Attendance</a></li>
+                    <li><a asp-controller="admin" asp-action="policy">Policy</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="right">
+            <div class="clock_section">
+                <h2 id="clock"></h2>
+            </div>
+            <div class="punch_section">
+                <input id="logout" type="button" value="Logout" onclick="location.href = '@Url.Action("logout", "admin")'" />
+                <input id="check_out" type="button" value="Check Out" onclick="hideCheckOutBtn();location.href = '@Url.Action("CheckOutFromAttendances", "admin")';" />
+                <input id="check_in" type="button" value="Check In" onclick="hideCheckInBtn();location.href = '@Url.Action("CheckInFromAttendances", "admin")';" />
+                <img src="@imagePath" />
+                <h3>@name</h3>
+            </div>
+
+            <div class="attendance_section">
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Date</th>
+                        <th>Check In</th>
+                        <th>Check Out</th>
+                        <th>Time Span</th>
+                    </tr>
+
+                    @foreach (var attendance in Model.IndividualAtten.Sorted)
+                    {
+                        var fullName = Model.IndividualAtten.IndividualEmp.FirstName + " " + 
+                            Model.IndividualAtten.IndividualEmp.MiddleName + " " + 
+                            Model.IndividualAtten.IndividualEmp.LastName;
+
+                        <tr>
+                            <td>@fullName</td>
+                            <td>@Model.IndividualAtten.IndividualEmp.EmailAddress</td>
+                            <td>@attendance.Date</td>
+                            <td>@attendance.CheckIn</td>
+                            <td>@attendance.CheckOut</td>
+                            <td>@attendance.TimeSpan</td>
+                        </tr>
+                    }
+                </table>
+            </div>
+        </div>
+    </div>
+    <script src="~/js/list_script.js"></script>
+</body>
+</html>
